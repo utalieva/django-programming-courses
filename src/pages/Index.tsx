@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -11,48 +11,16 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { EnrollmentDialog } from '@/components/EnrollmentDialog';
-import { AuthDialog } from '@/components/AuthDialog';
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [enrollmentOpen, setEnrollmentOpen] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState<{ title: string; id: number } | null>(null);
-  const [authOpen, setAuthOpen] = useState(false);
-  const [user, setUser] = useState<any>(null);
-
-  useEffect(() => {
-    const savedUser = localStorage.getItem('user');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
-  }, []);
 
   const handleEnrollClick = (courseTitle: string, courseId: number) => {
-    if (!user) {
-      setAuthOpen(true);
-      return;
-    }
     setSelectedCourse({ title: courseTitle, id: courseId });
     setEnrollmentOpen(true);
-  };
-
-  const handleAuthSuccess = (userData: any) => {
-    setUser(userData);
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-    setUser(null);
-    setActiveTab('home');
   };
 
   return (
@@ -73,38 +41,9 @@ const Index = () => {
             <button onClick={() => setActiveTab('faq')} className="text-sm font-medium hover:text-primary transition-colors">FAQ</button>
           </nav>
 
-          {user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button className="bg-gradient-purple hover:opacity-90">
-                  <Icon name="User" size={18} className="mr-2" />
-                  {user.name || user.username}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>Мой аккаунт</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => setActiveTab('dashboard')}>
-                  <Icon name="LayoutDashboard" size={16} className="mr-2" />
-                  Личный кабинет
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setActiveTab('dashboard')}>
-                  <Icon name="Settings" size={16} className="mr-2" />
-                  Настройки
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout} className="text-red-600">
-                  <Icon name="LogOut" size={16} className="mr-2" />
-                  Выйти
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <Button onClick={() => setAuthOpen(true)} className="bg-gradient-purple hover:opacity-90">
-              <Icon name="LogIn" size={18} className="mr-2" />
-              Войти
-            </Button>
-          )}
+          <Button onClick={() => setActiveTab('dashboard')} className="bg-gradient-purple hover:opacity-90">
+            Личный кабинет
+          </Button>
         </div>
       </header>
 
@@ -121,12 +60,6 @@ const Index = () => {
         onOpenChange={setEnrollmentOpen}
         courseTitle={selectedCourse?.title}
         courseId={selectedCourse?.id}
-      />
-
-      <AuthDialog
-        open={authOpen}
-        onOpenChange={setAuthOpen}
-        onAuthSuccess={handleAuthSuccess}
       />
 
       <footer className="bg-slate-900 text-white py-12 mt-20">
@@ -189,7 +122,7 @@ const HomeSection = ({ setActiveTab, onEnrollClick }: { setActiveTab: (tab: stri
                 <Button size="lg" className="bg-accent hover:bg-accent/90 text-white text-lg px-8 py-6" onClick={() => onEnrollClick('Python Основы', 1)}>
                   Записаться на курс
                 </Button>
-                <Button size="lg" variant="outline" className="border-2 border-white text-white bg-transparent hover:bg-white hover:text-primary text-lg px-8 py-6" onClick={() => setActiveTab('courses')}>
+                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-primary text-lg px-8 py-6" onClick={() => setActiveTab('courses')}>
                   Узнать больше
                 </Button>
               </div>
@@ -224,7 +157,7 @@ const HomeSection = ({ setActiveTab, onEnrollClick }: { setActiveTab: (tab: stri
               { title: 'Django веб-разработка', level: 'Средний', duration: '4 месяца', icon: 'Globe', color: 'bg-purple-500' },
               { title: 'Продвинутый Python', level: 'Продвинутый', duration: '5 месяцев', icon: 'Rocket', color: 'bg-orange-500' }
             ].map((course, i) => (
-              <Card key={i} className="p-6 hover:shadow-xl transition-all hover:-translate-y-2 cursor-pointer animate-slide-up flex flex-col" style={{ animationDelay: `${i * 0.1}s` }}>
+              <Card key={i} className="p-6 hover:shadow-xl transition-all hover:-translate-y-2 cursor-pointer animate-slide-up" style={{ animationDelay: `${i * 0.1}s` }}>
                 <div className={`${course.color} w-16 h-16 rounded-2xl flex items-center justify-center mb-4`}>
                   <Icon name={course.icon as any} size={32} className="text-white" />
                 </div>
@@ -233,8 +166,8 @@ const HomeSection = ({ setActiveTab, onEnrollClick }: { setActiveTab: (tab: stri
                   <Badge variant="secondary">{course.level}</Badge>
                   <Badge variant="outline">{course.duration}</Badge>
                 </div>
-                <p className="text-muted-foreground mb-4 flex-grow">Освойте основы программирования на Python и создайте свои первые проекты</p>
-                <Button className="w-full bg-gradient-purple mt-auto" onClick={() => setActiveTab('courses')}>
+                <p className="text-muted-foreground mb-4">Освойте основы программирования на Python и создайте свои первые проекты</p>
+                <Button className="w-full bg-gradient-purple" onClick={() => setActiveTab('courses')}>
                   Подробнее
                 </Button>
               </Card>
@@ -346,14 +279,14 @@ const CoursesSection = ({ onEnrollClick }: { onEnrollClick: (title: string, id: 
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {courses.map((course, i) => (
-            <Card key={i} className="overflow-hidden hover:shadow-2xl transition-all hover:-translate-y-2 animate-fade-in flex flex-col" style={{ animationDelay: `${i * 0.1}s` }}>
+            <Card key={i} className="overflow-hidden hover:shadow-2xl transition-all hover:-translate-y-2 animate-fade-in" style={{ animationDelay: `${i * 0.1}s` }}>
               <div className={`${course.color} h-2`}></div>
-              <div className="p-6 flex flex-col flex-grow">
+              <div className="p-6">
                 <div className={`${course.color} w-16 h-16 rounded-2xl flex items-center justify-center mb-4`}>
                   <Icon name={course.icon as any} size={32} className="text-white" />
                 </div>
                 <h3 className="text-2xl font-bold mb-2">{course.title}</h3>
-                <p className="text-muted-foreground mb-4 flex-grow">{course.description}</p>
+                <p className="text-muted-foreground mb-4">{course.description}</p>
                 
                 <div className="space-y-2 mb-6">
                   <div className="flex items-center gap-2 text-sm">
@@ -371,7 +304,7 @@ const CoursesSection = ({ onEnrollClick }: { onEnrollClick: (title: string, id: 
                   </div>
                 </div>
                 
-                <div className="flex items-center justify-between pt-4 border-t mt-auto">
+                <div className="flex items-center justify-between pt-4 border-t">
                   <div className="text-2xl font-bold text-primary">{course.price}</div>
                   <Button className="bg-gradient-purple" onClick={() => onEnrollClick(course.title, course.id)}>Записаться</Button>
                 </div>
